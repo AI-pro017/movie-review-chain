@@ -1,52 +1,58 @@
-# movie
-**movie** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli).
+# Movie Review Chain
 
-## Get started
+A small Cosmos SDK blockchain where movies and reviews live on chain. Anyone can add a movie with its title, description and year, and other people can post reviews with a rating. Only the account that created a movie or review can edit or delete it.
 
-```
+The project was scaffolded with Ignite CLI. All the chain logic is in the `movie` module, and there's a generated Vue web app for browsing and submitting entries.
+
+## Tech stack
+
+- Cosmos SDK 0.45 with Tendermint
+- Ignite CLI for scaffolding and local development
+- Go 1.18
+- Vue 3 and Vite for the web app
+
+## Running the chain
+
+Install [Ignite CLI](https://docs.ignite.com), then from the repo root:
+
+```bash
 ignite chain serve
 ```
 
-`serve` command installs dependencies, builds, initializes, and starts your blockchain in development.
+This installs dependencies, builds the `movied` binary, creates a local test chain and starts it. The accounts in `config.yml` get funded at genesis: `alice` is the validator and `bob` runs the faucet.
 
-### Configure
+## Using it from the command line
 
-Your blockchain in development can be configured with `config.yml`. To learn more, see the [Ignite CLI docs](https://docs.ignite.com).
+```bash
+# add a movie
+movied tx movie create-movie "Arrival" "Linguist meets aliens" 2016 --from alice
 
-### Web Frontend
+# review it (movie id, rating, text)
+movied tx movie create-review 0 5 "Smart and moving" --from bob
 
-Ignite CLI has scaffolded a Vue.js-based web app in the `vue` directory. Run the following commands to install dependencies and start the app:
-
+# read things back
+movied query movie list-movie
+movied query movie show-review 0
 ```
+
+Movies can be changed with `update-movie` and `delete-movie`, and reviews with `update-review` and `delete-review`.
+
+## Web app
+
+```bash
 cd vue
 npm install
-npm run serve
+npm run dev
 ```
 
-The frontend app is built using the `@starport/vue` and `@starport/vuex` packages. For details, see the [monorepo for Ignite front-end development](https://github.com/ignite/web).
+The app talks to the local chain started by `ignite chain serve`.
 
-## Release
-To release a new version of your blockchain, create and push a new tag with `v` prefix. A new draft release with the configured targets will be created.
+## Project structure
 
+```text
+x/movie/      The movie module: keeper, messages, queries and CLI
+proto/movie/  Protobuf definitions for movies, reviews and the module's API
+app/          Chain setup
+cmd/movied/   The node binary
+vue/          Generated web app
 ```
-git tag v0.1
-git push origin v0.1
-```
-
-After a draft release is created, make your final changes from the release page and publish it.
-
-### Install
-To install the latest version of your blockchain node's binary, execute the following command on your machine:
-
-```
-curl https://get.ignite.com/username/movie@latest! | sudo bash
-```
-`username/movie` should match the `username` and `repo_name` of the Github repository to which the source code was pushed. Learn more about [the install process](https://github.com/allinbits/starport-installer).
-
-## Learn more
-
-- [Ignite CLI](https://ignite.com/cli)
-- [Tutorials](https://docs.ignite.com/guide)
-- [Ignite CLI docs](https://docs.ignite.com)
-- [Cosmos SDK docs](https://docs.cosmos.network)
-- [Developer Chat](https://discord.gg/ignite)
